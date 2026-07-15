@@ -15,3 +15,11 @@
 **Template** — Curated scaffold source (name, repo URL, description). Registry in code today; not the issue tracker.
 
 **Scaffold** — Deep module: validate name/dir → materialize template → optional `package.json` rename. Interface is `scaffoldFromTemplate` + `ScaffoldResult`.
+
+## Processes (in code)
+
+**RunningProcess** — `{ pid, command }` row from a point-in-time OS snapshot. Produced by `getRunningProcesses`; not a live handle and never blocks on the target process.
+
+**getRunningProcesses** — Module at `src/processes/` (export `qorrol/processes`). Bounded-time snapshot via platform backend (macOS: `ps -axo pid=,command=`). Optional `excludeCommandSubstrings` drops watcher/dev-server rows from the result without waiting on them.
+
+**qorrol ps** — CLI command (`src/commands/ps.ts`): runs `getRunningProcesses`, prints PID + command or `--json`. Flags: `-e/--exclude`, `-t/--timeout`.

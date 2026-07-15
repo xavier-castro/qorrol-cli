@@ -25,7 +25,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./issue-tracker": "./dist/issue-tracker/index.js",
-    "./triage": "./dist/triage/index.js"
+    "./triage": "./dist/triage/index.js",
+    "./processes": "./dist/processes/index.js"
   },
   "bin": {
     "qorrol": "./bin/qorrol.js"

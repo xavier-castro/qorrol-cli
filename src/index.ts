@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import { createProject } from "./commands/create.js";
 import { listTemplates } from "./commands/list.js";
+import { listRunningProcesses } from "./commands/ps.js";
 
 const program = new Command();
 
@@ -25,6 +26,23 @@ program
   .description("List available templates")
   .action(listTemplates);
 
+program
+  .command("ps")
+  .description("List running processes (bounded-time snapshot; does not wait on watchers)")
+  .option(
+    "-e, --exclude <patterns>",
+    "Comma-separated command substrings to omit (repeatable)",
+    (value: string, previous: string[]) => [...previous, value],
+    [] as string[],
+  )
+  .option(
+    "-t, --timeout <ms>",
+    "Snapshot timeout in milliseconds",
+    (value) => Number.parseInt(value, 10),
+  )
+  .option("--json", "Print JSON array of { pid, command }")
+  .action(listRunningProcesses);
+
 program.on("--help", () => {
   console.log("");
   console.log("Examples:");
@@ -36,6 +54,12 @@ program.on("--help", () => {
   );
   console.log(
     '  $ qorrol create saas-kit --name my-app  # Create in new directory "my-app"',
+  );
+  console.log(
+    "  $ qorrol ps                              # Snapshot of running processes",
+  );
+  console.log(
+    '  $ qorrol ps -e vite,watch --json         # JSON, excluding watcher-like commands',
   );
 });
 
