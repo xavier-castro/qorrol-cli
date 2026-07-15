@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "qorrol",
   "version": "1.0.14",
   "description": "A CLI tool for creating projects from curated templates",
@@ -21,6 +20,13 @@
     "type": "git",
     "url": "git+https://github.com/xavier-castro/qorrol-cli.git"
   },
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./issue-tracker": "./dist/issue-tracker/index.js",
+    "./triage": "./dist/triage/index.js"
+  },
   "bin": {
     "qorrol": "./bin/qorrol.js"
   },
@@ -28,53 +34,16 @@
     "dist/**/*",
     "bin/**/*"
   ],
-  "type": "module",
-  "main": "dist/index.js",
-=======
-  "name": "backpine",
-  "version": "1.0.14",
-  "description": "A CLI tool for creating projects from curated templates",
-  "type": "module",
-  "main": "dist/index.js",
-  "bin": {
-    "backpine": "./bin/backpine.js"
-  },
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsx --test src/**/*.test.ts"
   },
-<<<<<<< HEAD
-=======
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/backpine/backpine-cli.git"
-  },
-  "keywords": [
-    "cli",
-    "template",
-    "scaffold",
-    "generator",
-    "project",
-    "boilerplate"
-  ],
-  "author": "Backpine",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/backpine/backpine-cli/issues"
-  },
-  "homepage": "https://github.com/backpine/backpine-cli#readme",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
-  "files": [
-    "dist/**/*",
-    "bin/**/*"
-  ],
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
   "dependencies": {
     "chalk": "^5.6.0",
     "commander": "^14.0.0",
@@ -87,12 +56,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.3.0",
     "@types/validate-npm-package-name": "^4.0.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.9.2"
-<<<<<<< HEAD
-  },
-  "engines": {
-    "node": ">=16.0.0"
-=======
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
   }
 }

@@ -7,15 +7,9 @@ import { listTemplates } from "./commands/list.js";
 const program = new Command();
 
 program
-<<<<<<< HEAD
   .name("qorrol")
   .description("A CLI tool for creating projects from curated templates")
   .version("1.0.14");
-=======
-  .name("backpine")
-  .description("A CLI tool for creating projects from curated templates")
-  .version("1.0.7");
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 
 program
   .command("create <template-name>")
@@ -35,7 +29,6 @@ program.on("--help", () => {
   console.log("");
   console.log("Examples:");
   console.log(
-<<<<<<< HEAD
     "  $ qorrol list                           # List available templates",
   );
   console.log(
@@ -43,15 +36,6 @@ program.on("--help", () => {
   );
   console.log(
     '  $ qorrol create saas-kit --name my-app  # Create in new directory "my-app"',
-=======
-    "  $ backpine list                           # List available templates",
-  );
-  console.log(
-    "  $ backpine create saas-kit                # Create in current directory",
-  );
-  console.log(
-    '  $ backpine create saas-kit --name my-app  # Create in new directory "my-app"',
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
   );
 });
 

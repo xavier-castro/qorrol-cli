@@ -13,20 +13,12 @@ export async function listTemplates(): Promise<void> {
   console.log(chalk.gray("Usage:"));
   console.log(
     chalk.gray(
-<<<<<<< HEAD
       "  qorrol create <template-name>                # Create in current directory",
-=======
-      "  backpine create <template-name>                # Create in current directory",
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
     ),
   );
   console.log(
     chalk.gray(
-<<<<<<< HEAD
       "  qorrol create <template-name> --name <name>  # Create in new directory",
-=======
-      "  backpine create <template-name> --name <name>  # Create in new directory",
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
     ),
   );
   console.log();
