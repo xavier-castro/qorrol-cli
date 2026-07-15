@@ -1,0 +1,56 @@
+{
+  "name": "qorrol",
+  "version": "1.0.14",
+  "description": "A CLI tool for creating projects from curated templates",
+  "keywords": [
+    "boilerplate",
+    "cli",
+    "generator",
+    "project",
+    "scaffold",
+    "template"
+  ],
+  "homepage": "https://github.com/xavier-castro/qorrol-cli#readme",
+  "bugs": {
+    "url": "https://github.com/xavier-castro/qorrol-cli/issues"
+  },
+  "license": "MIT",
+  "author": "Backpine",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xavier-castro/qorrol-cli.git"
+  },
+  "bin": {
+    "qorrol": "./bin/qorrol.js"
+  },
+  "files": [
+    "dist/**/*",
+    "bin/**/*"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "chalk": "^5.6.0",
+    "commander": "^14.0.0",
+    "fs-extra": "^11.3.1",
+    "ora": "^8.2.0",
+    "simple-git": "^3.28.0",
+    "validate-npm-package-name": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.3.0",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

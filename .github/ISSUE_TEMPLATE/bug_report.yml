@@ -1,0 +1,26 @@
+name: Bug report
+description: Something broke in the qorrol CLI
+title: "[bug]: "
+labels: ["needs-triage"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Command you ran and what you expected vs what you got.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: qorrol version
+      placeholder: qorrol --version or npm list -g qorrol
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
