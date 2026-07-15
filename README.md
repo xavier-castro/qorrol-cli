@@ -5,13 +5,21 @@ A powerful CLI tool for creating projects from curated templates. Get started qu
 ## Installation
 
 ```bash
+<<<<<<< HEAD
 npm install -g qorrol
+=======
+npm install -g backpine
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 Or use without installing:
 
 ```bash
+<<<<<<< HEAD
 npx qorrol@latest
+=======
+npx backpine@latest
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ## Usage
@@ -20,6 +28,7 @@ npx qorrol@latest
 
 ```bash
 # Create project in current directory
+<<<<<<< HEAD
 qorrol create saas-kit
 # or
 npx qorrol@latest create saas-kit
@@ -28,19 +37,38 @@ npx qorrol@latest create saas-kit
 qorrol create saas-kit --name my-awesome-app
 # or
 npx qorrol@latest create saas-kit --name my-awesome-app
+=======
+backpine create saas-kit
+# or
+npx backpine@latest create saas-kit
+
+# Create project in a new directory
+backpine create saas-kit --name my-awesome-app
+# or
+npx backpine@latest create saas-kit --name my-awesome-app
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ### List available templates
 
 ```bash
+<<<<<<< HEAD
 qorrol list
+=======
+backpine list
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ### Get help
 
 ```bash
+<<<<<<< HEAD
 qorrol --help
 qorrol create --help
+=======
+backpine --help
+backpine create --help
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ## Available Templates
@@ -63,4 +91,8 @@ qorrol create --help
 
 ## License
 
+<<<<<<< HEAD
 MIT
+=======
+MIT
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184

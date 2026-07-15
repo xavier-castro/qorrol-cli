@@ -4,9 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+<<<<<<< HEAD
 overrides:
   qorrol: 'link:'
 
+=======
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 importers:
 
   .:
@@ -23,9 +26,12 @@ importers:
       ora:
         specifier: ^8.2.0
         version: 8.2.0
+<<<<<<< HEAD
       qorrol:
         specifier: 'link:'
         version: 'link:'
+=======
+>>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
       simple-git:
         specifier: ^3.28.0
         version: 3.28.0
