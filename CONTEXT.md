@@ -18,6 +18,10 @@
 
 **Scaffold** — Deep module: validate name/dir → materialize template → optional `package.json` rename. Interface is `scaffoldFromTemplate` + `ScaffoldResult`. Takes a `TemplateRegistry` (no module-global default) and an optional `TemplateMaterializer`; default materializer is git clone.
 
+**Nimbus** — Documentation-site framework (Astro + MDX, deployable to Cloudflare/Vercel/Netlify/Static). The `nimbus-site` template (`src/registry/inline-registry.ts`) scaffolds a Nimbus site via the same `scaffoldFromTemplate` flow as every other template.
+
+**Template category** — Bookkeeping tag on `Template` (e.g. `SaaS`, `Docs`). No consumer in `qorrol list`, completions, or the scaffolder today; carried on the type for parity with `saas-kit` and to anchor future grouping/filtering if it lands.
+
 ## Processes (in code)
 
 **RunningProcess** — `{ pid, command }` row from a point-in-time OS snapshot. Produced by `getRunningProcesses`; not a live handle and never blocks on the target process.

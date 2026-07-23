@@ -11,6 +11,13 @@ const DEFAULT_TEMPLATES: readonly Template[] = [
     branch: "main",
     category: "SaaS",
   },
+  {
+    name: "nimbus-site",
+    description: "A Nimbus documentation site scaffold",
+    repo: "https://github.com/xavier-castro/nimbus-site.git",
+    branch: "main",
+    category: "Docs",
+  },
 ];
 
 function assertUnique(templates: readonly Template[]): void {

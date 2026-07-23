@@ -72,7 +72,7 @@ program.on("--help", () => {
     "  $ qorrol create saas-kit                # Create in current directory",
   );
   console.log(
-    '  $ qorrol create saas-kit --name my-app  # Create in new directory "my-app"',
+    '  $ qorrol create nimbus-site --name my-site # Create a Nimbus docs site named "my-site"',
   );
   console.log(
     "  $ qorrol ps                              # Snapshot of running processes",
