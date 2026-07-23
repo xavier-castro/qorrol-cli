@@ -50,7 +50,7 @@ Module boundaries are enforced by package subpath exports — cross-boundary imp
 
 ## Naming
 
-The CLI is canonicalized on `qorrol`: `package.json` (`name: "qorrol"`, `bin: "qorrol"`), the binary is `bin/qorrol` (no extension, shebang `#!/usr/bin/env node`), and the README only refers to `qorrol`. The only remaining `backpine` references are the GitHub template repo URLs in `src/templates.ts` (those repos still live at the `backpine` org on GitHub — rename there if/when they move).
+The CLI is canonicalized on `qorrol`: `package.json` (`name: "qorrol"`, `bin: "qorrol"`), the binary is `bin/qorrol` (no extension, shebang `#!/usr/bin/env node`), and the README only refers to `qorrol`. Templates live under the `xavier-castro` GitHub account (see `src/registry/inline-registry.ts`).
 
 ## Skill routing (injected from system prompt, summarized here)
 

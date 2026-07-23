@@ -93,6 +93,49 @@ import { getRunningProcesses } from "qorrol/processes";
 import { attentionBuckets } from "qorrol/triage";
 ```
 
+## Local development (npm link)
+
+To run your local checkout as the `qorrol` command instead of the published package:
+
+```bash
+# 1. Build first — bin/qorrol is a shim that imports ../dist/index.js,
+#    so the CLI won't run until dist/ exists
+npm install
+npm run build
+
+# 2. Register the checkout as a global link
+npm link
+
+# 3. Verify it resolves to your checkout
+which qorrol
+qorrol --help
+```
+
+While iterating, keep the build fresh in another terminal so every `qorrol` invocation picks up your changes:
+
+```bash
+npm run dev   # tsc --watch
+```
+
+To consume the library subpath exports (`qorrol/issue-tracker`, `qorrol/processes`, etc.) from another local project, link it there:
+
+```bash
+cd /path/to/other-project
+npm link qorrol
+```
+
+When you're done, unlink to go back to the published package:
+
+```bash
+# in the consuming project (if you linked it there)
+npm unlink qorrol
+
+# in the qorrol-cli checkout — removes the global link
+npm unlink -g qorrol
+```
+
+> **Note:** `npx qorrol` may still resolve the published package from the npm cache. Use the linked `qorrol` binary directly when testing local changes.
+
 ## License
 
 MIT
