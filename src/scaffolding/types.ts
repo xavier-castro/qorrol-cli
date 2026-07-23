@@ -1,4 +1,5 @@
 import type { Template } from "../types/index.js";
+import type { TemplateRegistry } from "../registry/types.js";
 
 /** Materializes template bytes into targetDir (git clone, fixture copy, etc.). */
 export type TemplateMaterializer = (
@@ -11,6 +12,9 @@ export interface ScaffoldInput {
   /** When set, scaffold into a new directory with this npm-safe name. */
   projectName?: string;
   cwd: string;
+  /** Source of Templates. Required — no default registry in the deep module. */
+  registry: TemplateRegistry;
+  /** Override how a Template becomes bytes on disk (default: git clone). */
   materialize?: TemplateMaterializer;
 }
 

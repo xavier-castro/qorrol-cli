@@ -12,9 +12,11 @@
 
 ## CLI (existing)
 
-**Template** — Curated scaffold source (name, repo URL, description). Registry in code today; not the issue tracker.
+**Template** — Curated scaffold source (name, repo URL, description). Defined as data; resolved through a `TemplateRegistry`.
 
-**Scaffold** — Deep module: validate name/dir → materialize template → optional `package.json` rename. Interface is `scaffoldFromTemplate` + `ScaffoldResult`.
+**TemplateRegistry** — Read-only source of `Template`s: `list()` and `resolve(name)`. The `InlineRegistry` adapter (`src/registry/inline-registry.ts`) is the curated default; future adapters (local-path, npm) plug in via the same interface. Four call sites converge on it: `scaffoldFromTemplate`, `commands/list`, `commands/completion`, `src/index.ts` (wiring).
+
+**Scaffold** — Deep module: validate name/dir → materialize template → optional `package.json` rename. Interface is `scaffoldFromTemplate` + `ScaffoldResult`. Takes a `TemplateRegistry` (no module-global default) and an optional `TemplateMaterializer`; default materializer is git clone.
 
 ## Processes (in code)
 

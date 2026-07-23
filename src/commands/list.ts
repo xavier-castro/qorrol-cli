@@ -1,10 +1,12 @@
 import chalk from "chalk";
-import { templates } from "../templates.js";
+import type { TemplateRegistry } from "../registry/types.js";
 
-export async function listTemplates(): Promise<void> {
+export async function listTemplates(
+  registry: TemplateRegistry,
+): Promise<void> {
   console.log(chalk.blue.bold("\nAvailable Templates:\n"));
 
-  templates.forEach((template) => {
+  registry.list().forEach((template) => {
     console.log(chalk.green(`  ${template.name}`));
     console.log(chalk.gray(`    ${template.description}`));
     console.log();

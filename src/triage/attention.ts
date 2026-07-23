@@ -1,3 +1,4 @@
+import type { IssueTracker } from "../issue-tracker/interface.js";
 import type { IssueDetail, IssueRecord, TriageLabelMap } from "../issue-tracker/types.js";
 
 export interface AttentionItem {
@@ -17,7 +18,7 @@ export interface AttentionReport {
   buckets: AttentionBucket[];
 }
 
-const TRIAGE_NOTES_MARKERS = ["## Triage Notes", "## triage notes"];
+const TRIAGE_NOTES_MARKER = "## triage notes";
 
 function toItem(issue: IssueRecord): AttentionItem {
   return {
@@ -39,9 +40,9 @@ function sortOldestFirst<T extends { createdAt: string }>(items: T[]): T[] {
 export function lastTriageNotesAt(issue: IssueDetail): string | null {
   let latest: string | null = null;
   for (const comment of issue.comments) {
-    const hasMarker = TRIAGE_NOTES_MARKERS.some((m) =>
-      comment.body.includes(m),
-    );
+    const hasMarker = comment.body
+      .toLowerCase()
+      .includes(TRIAGE_NOTES_MARKER);
     if (!hasMarker) continue;
     if (
       !latest ||
@@ -120,18 +121,18 @@ export function attentionBuckets(
   };
 }
 
-/** Fetches details for open issues and computes attention buckets. */
+/**
+ * Fetches details for open issues and computes attention buckets.
+ *
+ * Delegates bulk read to `IssueTracker.viewMany` — a future adapter (e.g.
+ * GraphQL-backed) can collapse the per-issue round-trips into one query
+ * without touching this function.
+ */
 export async function attentionFromTracker(
-  tracker: {
-    listOpen(): Promise<IssueRecord[]>;
-    view(number: number): Promise<IssueDetail>;
-  },
+  tracker: IssueTracker,
   labelMap: TriageLabelMap,
 ): Promise<AttentionReport> {
   const open = await tracker.listOpen();
-  const details: IssueDetail[] = [];
-  for (const record of open) {
-    details.push(await tracker.view(record.number));
-  }
+  const details = await tracker.viewMany(open.map((r) => r.number));
   return attentionBuckets(details, labelMap);
 }

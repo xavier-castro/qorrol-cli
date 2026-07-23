@@ -1,0 +1,185 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import path from "path";
+import os from "os";
+import fs from "fs-extra";
+import type { Template } from "../types/index.js";
+import type { TemplateRegistry } from "../registry/types.js";
+import { createInlineRegistry } from "../registry/inline-registry.js";
+import { scaffoldFromTemplate } from "./scaffoldFromTemplate.js";
+
+const TEMPLATE: Template = {
+  name: "fixture",
+  description: "fixture template",
+  repo: "https://example.com/fixture.git",
+  branch: "main",
+};
+
+function makeRegistry(templates: Template[] = [TEMPLATE]): TemplateRegistry {
+  return createInlineRegistry(templates);
+}
+
+async function tmpDir(): Promise<string> {
+  return fs.mkdtemp(path.join(os.tmpdir(), "qorrol-scaffold-test-"));
+}
+
+test("scaffoldFromTemplate: ok path with materialize injection and package.json rename", async () => {
+  const cwd = await tmpDir();
+  try {
+    let materialized = "";
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "my-app",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async (_t, targetDir) => {
+        materialized = targetDir;
+        await fs.ensureDir(targetDir);
+        await fs.writeJson(path.join(targetDir, "package.json"), {
+          name: "fixture-template",
+          version: "0.0.0",
+        });
+      },
+    });
+
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(materialized, path.join(cwd, "my-app"));
+    assert.equal(result.renamedPackage, true);
+    assert.equal(result.projectName, "my-app");
+    const pkg = await fs.readJson(path.join(cwd, "my-app", "package.json"));
+    assert.equal(pkg.name, "my-app");
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: template_not_found returns the registry's available names", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: "missing",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async () => {},
+    });
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.equal(result.code, "template_not_found");
+    assert.deepEqual(result.availableTemplateNames, [TEMPLATE.name]);
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: invalid_project_name for non-npm-safe names", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "Has Spaces",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async () => {
+        throw new Error("materialize must not be called");
+      },
+    });
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.equal(result.code, "invalid_project_name");
+    assert.ok(
+      result.validationErrors && result.validationErrors.length > 0,
+      "validationErrors surfaces the npm-name validator output",
+    );
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: target_directory_exists when projectName dir is taken", async () => {
+  const cwd = await tmpDir();
+  try {
+    await fs.ensureDir(path.join(cwd, "taken"));
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "taken",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async () => {
+        throw new Error("materialize must not be called");
+      },
+    });
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.equal(result.code, "target_directory_exists");
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: materialize_failed surfaces the upstream error", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      cwd,
+      registry: makeRegistry(),
+      materialize: async () => {
+        throw new Error("network down");
+      },
+    });
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.equal(result.code, "materialize_failed");
+    assert.match(result.message, /network down/);
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: warns on non-empty cwd when no projectName given", async () => {
+  const cwd = await tmpDir();
+  try {
+    await fs.writeFile(path.join(cwd, "stray.txt"), "x");
+    let materializedTo = "";
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      cwd,
+      registry: makeRegistry(),
+      materialize: async (_t, targetDir) => {
+        materializedTo = targetDir;
+      },
+    });
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.warnedNonEmptyCwd, true);
+    assert.equal(materializedTo, cwd);
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: progress emits validated, materialize, rename_package", async () => {
+  const cwd = await tmpDir();
+  try {
+    const phases: string[] = [];
+    await scaffoldFromTemplate(
+      {
+        templateName: TEMPLATE.name,
+        projectName: "p",
+        cwd,
+        registry: makeRegistry(),
+        materialize: async (_t, targetDir) => {
+          await fs.ensureDir(targetDir);
+          await fs.writeJson(path.join(targetDir, "package.json"), {
+            name: "fixture",
+          });
+        },
+      },
+      (p) => phases.push(p.phase),
+    );
+    assert.deepEqual(phases, ["validated", "materialize", "rename_package"]);
+  } finally {
+    await fs.remove(cwd);
+  }
+});

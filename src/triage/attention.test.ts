@@ -1,9 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_TRIAGE_LABEL_MAP } from "../issue-tracker/labels.js";
+import { InMemoryIssueTracker } from "../issue-tracker/memory-issue-tracker.js";
 import type { IssueDetail } from "../issue-tracker/types.js";
 import {
   attentionBuckets,
+  attentionFromTracker,
   hasReporterActivitySinceTriageNotes,
   lastTriageNotesAt,
 } from "./attention.js";
@@ -94,4 +96,53 @@ test("lastTriageNotesAt picks latest notes comment", () => {
     ],
   });
   assert.equal(lastTriageNotesAt(i), "2026-01-03T00:00:00Z");
+});
+
+test("attentionFromTracker classifies issues across all three buckets", async () => {
+  const tracker = new InMemoryIssueTracker().seed(
+    issue({ number: 1, labels: [] }),
+    issue({ number: 2, labels: ["needs-triage"], createdAt: "2026-01-02T00:00:00Z" }),
+    issue({ number: 3, labels: ["ready-for-agent"] }),
+    issue({
+      number: 4,
+      labels: ["needs-info"],
+      createdAt: "2026-01-04T00:00:00Z",
+      comments: [
+        {
+          id: "1",
+          authorLogin: "maintainer",
+          createdAt: "2026-01-05T00:00:00Z",
+          body: "## Triage Notes\nNeed logs",
+        },
+        {
+          id: "2",
+          authorLogin: "reporter",
+          createdAt: "2026-01-06T00:00:00Z",
+          body: "here are logs",
+        },
+      ],
+    }),
+  );
+
+  const report = await attentionFromTracker(tracker, DEFAULT_TRIAGE_LABEL_MAP);
+  assert.deepEqual(
+    report.buckets[0]!.items.map((i) => i.number),
+    [1],
+  );
+  assert.deepEqual(
+    report.buckets[1]!.items.map((i) => i.number),
+    [2],
+  );
+  assert.deepEqual(
+    report.buckets[2]!.items.map((i) => i.number),
+    [4],
+  );
+});
+
+test("attentionFromTracker returns empty buckets when tracker has no issues", async () => {
+  const tracker = new InMemoryIssueTracker();
+  const report = await attentionFromTracker(tracker, DEFAULT_TRIAGE_LABEL_MAP);
+  for (const bucket of report.buckets) {
+    assert.equal(bucket.items.length, 0);
+  }
 });

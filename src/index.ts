@@ -4,6 +4,8 @@ import { Command } from "commander";
 import { createProject } from "./commands/create.js";
 import { listTemplates } from "./commands/list.js";
 import { listRunningProcesses } from "./commands/ps.js";
+import { getCompletionScript, listSupportedShells } from "./commands/completion.js";
+import { inlineRegistry } from "./registry/inline-registry.js";
 
 const program = new Command();
 
@@ -19,12 +21,14 @@ program
     "-n, --name <name>",
     "Project directory name (creates in current directory if not specified)",
   )
-  .action(createProject);
+  .action((templateName: string, options: { name?: string }) =>
+    createProject(templateName, options, inlineRegistry),
+  );
 
 program
   .command("list")
   .description("List available templates")
-  .action(listTemplates);
+  .action(() => listTemplates(inlineRegistry));
 
 program
   .command("ps")
@@ -43,6 +47,21 @@ program
   .option("--json", "Print JSON array of { pid, command }")
   .action(listRunningProcesses);
 
+program
+  .command("completion <shell>")
+  .description(
+    `Output a shell completion script (supported: ${listSupportedShells().join(", ")})`,
+  )
+  .action((shell: string) => {
+    try {
+      process.stdout.write(getCompletionScript(shell, inlineRegistry));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(message);
+      process.exit(1);
+    }
+  });
+
 program.on("--help", () => {
   console.log("");
   console.log("Examples:");
@@ -60,6 +79,9 @@ program.on("--help", () => {
   );
   console.log(
     '  $ qorrol ps -e vite,watch --json         # JSON, excluding watcher-like commands',
+  );
+  console.log(
+    "  $ qorrol completion bash > ~/.qorrol-completion.bash",
   );
 });
 

@@ -2,10 +2,12 @@ import chalk from "chalk";
 import ora from "ora";
 import { CreateOptions } from "../types/index.js";
 import { scaffoldFromTemplate } from "../scaffolding/index.js";
+import type { TemplateRegistry } from "../registry/types.js";
 
 export async function createProject(
   templateName: string,
-  options: CreateOptions = {},
+  options: CreateOptions,
+  registry: TemplateRegistry,
 ): Promise<void> {
   const projectName = options.name;
   const locationMessage = projectName
@@ -21,6 +23,7 @@ export async function createProject(
       templateName,
       projectName: options.name,
       cwd: process.cwd(),
+      registry,
     },
     (progress) => {
       if (progress.phase === "validated" && progress.warnedNonEmptyCwd) {
@@ -51,7 +54,6 @@ export async function createProject(
           );
         }
         process.exit(1);
-        break;
       case "invalid_project_name":
         console.log(
           chalk.red(
@@ -59,16 +61,13 @@ export async function createProject(
           ),
         );
         process.exit(1);
-        break;
       case "target_directory_exists":
         console.log(chalk.red(result.message));
         process.exit(1);
-        break;
       case "materialize_failed":
         spinner.fail("Failed to create project");
         console.error(chalk.red("Error:"), result.message);
         process.exit(1);
-        break;
     }
     return;
   }

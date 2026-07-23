@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import type { IssueTracker } from "./interface.js";
 import type { IssueComment, IssueDetail, IssueRecord } from "./types.js";
 import { IssueTrackerError } from "./types.js";
-import { assertGhAvailable, type RepoContext } from "./discovery.js";
+import { assertGhAvailable, resolveRepoContext, type RepoContext } from "./discovery.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -110,7 +110,6 @@ export class GhIssueTracker implements IssueTracker {
   }
 
   static async create(cwd: string): Promise<GhIssueTracker> {
-    const { resolveRepoContext } = await import("./discovery.js");
     await assertGhAvailable();
     const context = await resolveRepoContext(cwd);
     return new GhIssueTracker(context);
@@ -158,6 +157,16 @@ export class GhIssueTracker implements IssueTracker {
     ];
     const { stdout } = await runGh(this.context.cwd, args);
     return mapDetail(parseJson<GhIssueJson>(stdout, "issue view"));
+  }
+
+  /**
+   * Bulk read via parallel `gh issue view` invocations. The gh CLI exposes no
+   * server-side projection that returns IssueDetail (comments included) in one
+   * call, so each entry is fetched individually. A future adapter backed by
+   * GitHub's GraphQL API can replace this body with a single batched query.
+   */
+  async viewMany(numbers: readonly number[]): Promise<IssueDetail[]> {
+    return Promise.all(numbers.map((n) => this.view(n)));
   }
 
   async comment(number: number, body: string): Promise<void> {

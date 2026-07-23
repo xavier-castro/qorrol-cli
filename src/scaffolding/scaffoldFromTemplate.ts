@@ -1,6 +1,5 @@
 import path from "path";
 import fs from "fs-extra";
-import { getTemplate, templates } from "../templates.js";
 import { cloneRepository } from "../utils/git.js";
 import {
   validateProjectName,
@@ -23,13 +22,13 @@ export async function scaffoldFromTemplate(
 ): Promise<ScaffoldResult> {
   const materialize = input.materialize ?? defaultMaterialize;
 
-  const template = getTemplate(input.templateName);
+  const template = input.registry.resolve(input.templateName);
   if (!template) {
     return {
       ok: false,
       code: "template_not_found",
       message: `Template "${input.templateName}" not found`,
-      availableTemplateNames: templates.map((t) => t.name),
+      availableTemplateNames: input.registry.list().map((t) => t.name),
     };
   }
 

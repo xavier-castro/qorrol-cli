@@ -49,6 +49,10 @@ export class InMemoryIssueTracker implements IssueTracker {
     return structuredClone(issue);
   }
 
+  async viewMany(numbers: readonly number[]): Promise<IssueDetail[]> {
+    return Promise.all(numbers.map((n) => this.view(n)));
+  }
+
   async comment(number: number, body: string): Promise<void> {
     const issue = await this.view(number);
     issue.comments.push({

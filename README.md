@@ -1,25 +1,17 @@
-# Backpine CLI
+# qorrol CLI
 
 A powerful CLI tool for creating projects from curated templates. Get started quickly with modern, production-ready project templates.
 
 ## Installation
 
 ```bash
-<<<<<<< HEAD
 npm install -g qorrol
-=======
-npm install -g backpine
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 Or use without installing:
 
 ```bash
-<<<<<<< HEAD
 npx qorrol@latest
-=======
-npx backpine@latest
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ## Usage
@@ -28,7 +20,6 @@ npx backpine@latest
 
 ```bash
 # Create project in current directory
-<<<<<<< HEAD
 qorrol create saas-kit
 # or
 npx qorrol@latest create saas-kit
@@ -37,43 +28,41 @@ npx qorrol@latest create saas-kit
 qorrol create saas-kit --name my-awesome-app
 # or
 npx qorrol@latest create saas-kit --name my-awesome-app
-=======
-backpine create saas-kit
-# or
-npx backpine@latest create saas-kit
-
-# Create project in a new directory
-backpine create saas-kit --name my-awesome-app
-# or
-npx backpine@latest create saas-kit --name my-awesome-app
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ### List available templates
 
 ```bash
-<<<<<<< HEAD
 qorrol list
-=======
-backpine list
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
 ```
 
 ### Get help
 
 ```bash
-<<<<<<< HEAD
 qorrol --help
 qorrol create --help
-=======
-backpine --help
-backpine create --help
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184
+```
+
+### Shell completions
+
+Generate a completion script for your shell, then `source` it (or save it where your shell loads from):
+
+```bash
+# bash
+qorrol completion bash > ~/.qorrol-completion.bash
+echo 'source ~/.qorrol-completion.bash' >> ~/.bashrc
+
+# zsh
+qorrol completion zsh > "${fpath[1]}/_qorrol"
+# then run: autoload -U compinit && compinit
+
+# fish
+qorrol completion fish > ~/.config/fish/completions/qorrol.fish
 ```
 
 ## Available Templates
 
-- **saas-kit** - A complete SaaS starter kit with authentication, billing, and more
+Run `qorrol list` to see the current curated registry. Templates are defined in `src/registry/inline-registry.ts`; add a new entry there to publish a template.
 
 ## Features
 
@@ -81,18 +70,29 @@ backpine create --help
 - 🎯 **Curated templates** - Production-ready templates with best practices
 - 🔧 **Smart initialization** - Automatically sets up git repository and updates package.json
 - 🎨 **Beautiful output** - Colored terminal output with progress indicators
+- 📸 **`qorrol ps`** - Bounded-time snapshot of running processes (no waiting on watchers)
 
 ## What it does
 
+When you run `qorrol create <template>`:
+
 1. **Clones** the selected template repository
 2. **Removes** git history from the template
-3. **Updates** project name in package.json (if --name is provided)
+3. **Updates** project name in package.json (if `--name` is provided)
 4. **Initializes** a fresh git repository
+
+`qorrol ps` takes a point-in-time snapshot of running processes (macOS only) with `-e/--exclude` (repeatable, comma-separated substrings) and `--json` flags, and a configurable timeout via `-t/--timeout`.
+
+## Programmatic API
+
+The same building blocks are also exported as subpath imports for use in other Node tooling:
+
+```ts
+import { createGhIssueTrackerBundle } from "qorrol/issue-tracker";
+import { getRunningProcesses } from "qorrol/processes";
+import { attentionBuckets } from "qorrol/triage";
+```
 
 ## License
 
-<<<<<<< HEAD
 MIT
-=======
-MIT
->>>>>>> 43bdd237f96a5ae42ef606180cc11172efdd7184

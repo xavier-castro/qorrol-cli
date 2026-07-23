@@ -1,4 +1,5 @@
 import path from "path";
+import { access } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { IssueTrackerError } from "./types.js";
@@ -14,7 +15,6 @@ export async function resolveRepoContext(
 ): Promise<RepoContext> {
   const gitDir = path.join(cwd, ".git");
   try {
-    const { access } = await import("node:fs/promises");
     await access(gitDir);
   } catch {
     throw new IssueTrackerError(

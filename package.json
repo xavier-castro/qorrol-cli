@@ -26,10 +26,11 @@
     ".": "./dist/index.js",
     "./issue-tracker": "./dist/issue-tracker/index.js",
     "./triage": "./dist/triage/index.js",
-    "./processes": "./dist/processes/index.js"
+    "./processes": "./dist/processes/index.js",
+    "./scaffolding": "./dist/scaffolding/index.js"
   },
   "bin": {
-    "qorrol": "./bin/qorrol.js"
+    "qorrol": "./bin/qorrol"
   },
   "files": [
     "dist/**/*",
