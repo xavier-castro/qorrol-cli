@@ -18,6 +18,14 @@ const DEFAULT_TEMPLATES: readonly Template[] = [
     branch: "main",
     category: "Docs",
   },
+  {
+    name: "landing-kit",
+    description:
+      "A marketing landing page starter with TanStack Start, Canvas UI, and an AI assistant",
+    repo: "https://github.com/xavier-castro/landing-kit.git",
+    branch: "main",
+    category: "Marketing",
+  },
 ];
 
 function assertUnique(templates: readonly Template[]): void {

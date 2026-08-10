@@ -54,6 +54,17 @@ test("InlineRegistry: defaults resolve to themselves via the registry", () => {
   }
 });
 
+test("InlineRegistry: landing-kit resolves to its curated template", () => {
+  assert.deepEqual(inlineRegistry.resolve("landing-kit"), {
+    name: "landing-kit",
+    description:
+      "A marketing landing page starter with TanStack Start, Canvas UI, and an AI assistant",
+    repo: "https://github.com/xavier-castro/landing-kit.git",
+    branch: "main",
+    category: "Marketing",
+  });
+});
+
 test("InlineRegistry: rejects duplicate names at construction", () => {
   assert.throws(
     () => createInlineRegistry([SAAS, { ...SAAS }]),

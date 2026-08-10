@@ -20,7 +20,9 @@
 
 **Nimbus** — Documentation-site framework (Astro + MDX, deployable to Cloudflare/Vercel/Netlify/Static). The `nimbus-site` template (`src/registry/inline-registry.ts`) scaffolds a Nimbus site via the same `scaffoldFromTemplate` flow as every other template.
 
-**Template category** — Bookkeeping tag on `Template` (e.g. `SaaS`, `Docs`). No consumer in `qorrol list`, completions, or the scaffolder today; carried on the type for parity with `saas-kit` and to anchor future grouping/filtering if it lands.
+**Template category** — Bookkeeping tag on `Template` (e.g. `SaaS`, `Docs`, `Marketing`). No consumer in `qorrol list`, completions, or the scaffolder today; carried on the type for parity with curated templates and to anchor future grouping/filtering if it lands.
+
+**Landing-kit** — Marketing landing-page template for creating a client-facing site; it is scaffolded through the same Template and Scaffold flow as the other curated templates.
 
 ## Processes (in code)
 

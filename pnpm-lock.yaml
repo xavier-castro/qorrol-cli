@@ -204,12 +204,17 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  bin: link:bin
   qorrol: 'link:'
+  src: link:src
 
 importers:
 
   .:
     dependencies:
+      bin:
+        specifier: link:bin
+        version: link:bin
       chalk:
         specifier: ^5.6.0
         version: 5.6.2
@@ -228,6 +233,9 @@ importers:
       simple-git:
         specifier: ^3.28.0
         version: 3.28.0
+      src:
+        specifier: link:src
+        version: link:src
       validate-npm-package-name:
         specifier: ^6.0.2
         version: 6.0.2
