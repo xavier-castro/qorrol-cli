@@ -1,6 +1,2 @@
 allowBuilds:
   esbuild: true
-overrides:
-  bin: link:bin
-  qorrol: 'link:'
-  src: link:src

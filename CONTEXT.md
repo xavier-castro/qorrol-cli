@@ -30,4 +30,6 @@
 
 **getRunningProcesses** — Module at `src/processes/` (export `qorrol/processes`). Bounded-time snapshot via platform backend (macOS: `ps -axo pid=,command=`). Optional `excludeCommandSubstrings` drops watcher/dev-server rows from the result without waiting on them.
 
-**qorrol ps** — CLI command (`src/commands/ps.ts`): runs `getRunningProcesses`, prints PID + command or `--json`. Flags: `-e/--exclude`, `-t/--timeout`.
+**qorrol ps** — CLI command (`src/commands/ps.ts`): runs `getRunningProcesses`, prints PID + command or `--json` envelope `{ processes, count }`. Flags: `-e/--exclude`, `-t/--timeout`.
+
+**qorrol doctor / resolve / issues / request** — Agent-facing commands. `doctor` reports setup without requiring auth. `resolve` turns a template name into a registry record. `issues` is the GitHub IssueTracker CLI (`list`, `view`, `attention`, writes with `--dry-run`). `request` is the raw `gh` hatch. Companion skill: `docs/agents/cli.md`.

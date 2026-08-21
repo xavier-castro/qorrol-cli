@@ -66,6 +66,18 @@ export async function scaffoldFromTemplate(
 
   onProgress?.({ phase: "validated", warnedNonEmptyCwd });
 
+  if (input.dryRun) {
+    return {
+      ok: true,
+      template,
+      targetDir,
+      projectName,
+      renamedPackage: false,
+      warnedNonEmptyCwd,
+      dryRun: true,
+    };
+  }
+
   onProgress?.({ phase: "materialize" });
   try {
     await materialize(template, targetDir);
@@ -98,5 +110,6 @@ export async function scaffoldFromTemplate(
     projectName,
     renamedPackage,
     warnedNonEmptyCwd,
+    dryRun: false,
   };
 }

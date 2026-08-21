@@ -8,6 +8,8 @@ export interface Template {
 
 export interface CreateOptions {
   name?: string;
+  json?: boolean;
+  dryRun?: boolean;
 }
 
 export interface ProjectConfig {

@@ -2,7 +2,7 @@
 
 ## What this is
 
-Node CLI + library. The CLI (`qorrol`) scaffolds projects from a curated template registry and ships a `ps` command for bounded process snapshots. Subpath exports also re-export the building blocks as a library:
+Node CLI + library. The CLI (`qorrol`) scaffolds projects from a curated template registry, ships a `ps` command for bounded process snapshots, and exposes GitHub issues (`qorrol issues …`) plus a raw `gh` hatch (`qorrol request`). Subpath exports also re-export the building blocks as a library:
 
 - `qorrol` → `dist/index.js` (CLI entry, also the default library surface)
 - `qorrol/issue-tracker` → `dist/issue-tracker/index.js`
@@ -30,17 +30,21 @@ PR template (`.github/PULL_REQUEST_TEMPLATE.md`) asks for `npm run build` plus a
 src/
 ├── index.ts                  CLI entry (commander program); wires inlineRegistry
 ├── registry/                 TemplateRegistry interface + InlineRegistry adapter
-├── commands/                 CLI command handlers (create, list, ps, completion)
+├── commands/                 CLI command handlers (create, list, resolve, doctor, ps, issues, request, completion)
 ├── scaffolding/              scaffoldFromTemplate + types (takes a registry + optional materializer)
 ├── issue-tracker/            IssueTracker interface, GhIssueTracker, InMemoryIssueTracker, label map
 ├── processes/                getRunningProcesses + darwin platform backend
-└── triage/                   attentionBuckets — pure, no I/O
+├── triage/                   attentionBuckets — pure, no I/O
+└── utils/                    git, validation, JSON envelope (output.ts)
 ```
 
 Module boundaries are enforced by package subpath exports — cross-boundary imports go through `dist/<module>/index.js`, never by reaching into `dist/<module>/file.js`.
 
 ## Quirks / things an agent would miss
 
+- **`--json` envelope.** Success is `{ ok: true, command, data }` on stdout; errors are `{ ok: false, error: { code, message, details? } }` and a nonzero exit. Global `--json` walks parent commands (`qorrol --json issues list`). Progress stays on stderr. Policy is in the README.
+- **`doctor` never requires GitHub auth.** Missing `gh` / tokens are optional checks (`source`: `env` | `provider` | `missing`). Tokens are never printed.
+- **`create --dry-run`** validates and resolves but does not clone. **`issues comment|label|close --dry-run`** previews writes. **`request`** refuses mutating `gh` verbs unless `--write`.
 - **`getRunningProcesses` is macOS-only.** `src/processes/platform/index.ts` throws `GetRunningProcessesError("unsupported_platform", ...)` for anything other than `darwin`. On Linux/Windows CI it will fail. The test seam is the `snapshot` option on `getRunningProcesses` / `snapshotPlatformProcesses` — pass an injectable `() => Promise<RunningProcess[]>` and don't shell out.
 - **Default timeout is 5_000 ms** for the process snapshot (`src/processes/get-running-processes.ts`). Raise via `-t`/`--timeout` or `timeoutMs`.
 - **Template registry is in code, not config.** `src/registry/inline-registry.ts` exports `inlineRegistry` (default) and `createInlineRegistry([...])` (factory). To add/remove a template, edit the `DEFAULT_TEMPLATES` array. Each entry needs `name`, `description`, `repo`, `branch`, `category`. `cloneRepository` in `src/utils/git.ts` does `--depth 1` and strips `.git` from the clone.

@@ -1,6 +1,6 @@
 # qorrol CLI
 
-A powerful CLI tool for creating projects from curated templates. Get started quickly with modern, production-ready project templates.
+CLI for scaffolding projects from curated templates, taking a bounded process snapshot, and driving GitHub issues via `gh`.
 
 ## Installation
 
@@ -16,32 +16,18 @@ npx qorrol@latest
 
 ## Usage
 
-### Create a new project
-
-```bash
-# Create project in current directory
-qorrol create saas-kit
-# or
-npx qorrol@latest create saas-kit
-
-# Create project in a new directory
-qorrol create saas-kit --name my-awesome-app
-# or
-npx qorrol@latest create saas-kit --name my-awesome-app
-```
-
-### List available templates
-
-```bash
-qorrol list
-```
-
-### Get help
-
 ```bash
 qorrol --help
-qorrol create --help
+qorrol --json doctor
+qorrol --json list
+qorrol --json resolve saas-kit
+qorrol create saas-kit --name my-awesome-app --dry-run
+qorrol create saas-kit --name my-awesome-app
+qorrol --json issues list --limit 20
+qorrol --json ps -e vite,watch
 ```
+
+`--json` may be passed globally (`qorrol --json doctor`) or on the command (`qorrol doctor --json`).
 
 ### Shell completions
 
@@ -60,28 +46,48 @@ qorrol completion zsh > "${fpath[1]}/_qorrol"
 qorrol completion fish > ~/.config/fish/completions/qorrol.fish
 ```
 
-## Available Templates
+## JSON policy
 
-Run `qorrol list` to see the current curated registry. Templates are defined in `src/registry/inline-registry.ts`; add a new entry there to publish a template.
+Under `--json`, stdout is a single JSON value and nothing else. Spinners, warnings, and `gh` diagnostics go to stderr. Tokens are never printed.
 
-## Features
+Success envelope:
 
-- 🚀 **Fast setup** - Get a new project running in seconds
-- 🎯 **Curated templates** - Production-ready templates with best practices
-- 🔧 **Smart initialization** - Automatically sets up git repository and updates package.json
-- 🎨 **Beautiful output** - Colored terminal output with progress indicators
-- 📸 **`qorrol ps`** - Bounded-time snapshot of running processes (no waiting on watchers)
+```json
+{ "ok": true, "command": "list", "data": { } }
+```
 
-## What it does
+Error envelope (nonzero exit):
 
-When you run `qorrol create <template>`:
+```json
+{ "ok": false, "error": { "code": "template_not_found", "message": "...", "details": { } } }
+```
 
-1. **Clones** the selected template repository
-2. **Removes** git history from the template
-3. **Updates** project name in package.json (if `--name` is provided)
-4. **Initializes** a fresh git repository
+`details` is omitted when empty. `doctor` uses the success envelope even when optional GitHub auth is missing; `data.ready` is false only when a required check (Node ≥ 18, git, non-empty template registry) fails.
 
-`qorrol ps` takes a point-in-time snapshot of running processes (macOS only) with `-e/--exclude` (repeatable, comma-separated substrings) and `--json` flags, and a configurable timeout via `-t/--timeout`.
+Command families:
+
+| command | `data` |
+| --- | --- |
+| `doctor` | version, checks, templates, github `{ tokenAvailable, source, ghAvailable }` |
+| `list` | `{ templates, count }` |
+| `resolve` | the template record (`name`, `description`, `repo`, `branch`, `category`) |
+| `create` | `{ template, targetDir, projectName, renamedPackage, dryRun, ... }` |
+| `ps` | `{ processes: [{ pid, command }], count }` |
+| `issues.*` | issues, attention buckets, or the write preview |
+| `request` | `{ args, kind, body }` (`body` is parsed JSON when `gh` printed JSON) |
+
+## Commands
+
+- **doctor** — Node, git, templates, `ps` platform support, optional `gh` + GitHub auth (`env` / `provider` / `missing`). Auth is not required.
+- **list** / **resolve** — discover and resolve curated templates.
+- **create** — clone a template (strips `.git`, optional `package.json` rename). `--dry-run` validates without writing.
+- **ps** — macOS-only bounded snapshot. `-e/--exclude`, `-t/--timeout`.
+- **issues** — `list`, `view`, `attention`, `comment`, `label`, `close`. Writes accept `--dry-run`. Requires `gh` and a git checkout.
+- **request** — raw `gh` passthrough. Mutating verbs need `--write`.
+
+Agent-oriented walkthrough: [docs/agents/cli.md](docs/agents/cli.md).
+
+Templates are defined in `src/registry/inline-registry.ts`.
 
 ## Programmatic API
 
@@ -100,15 +106,19 @@ To run your local checkout as the `qorrol` command instead of the published pack
 ```bash
 # 1. Build first — bin/qorrol is a shim that imports ../dist/index.js,
 #    so the CLI won't run until dist/ exists
-npm install
-npm run build
+pnpm install
+pnpm run build
 
-# 2. Register the checkout as a global link
-npm link
+# 2a. Symlink into ~/.local/bin (preferred for agents)
+make install-local
 
-# 3. Verify it resolves to your checkout
-which qorrol
+# 2b. Or register the checkout as a global npm/pnpm link
+pnpm link --global
+
+# 3. Verify it resolves outside this folder
+command -v qorrol
 qorrol --help
+qorrol --json doctor
 ```
 
 While iterating, keep the build fresh in another terminal so every `qorrol` invocation picks up your changes:

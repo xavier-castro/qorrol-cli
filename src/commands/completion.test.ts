@@ -18,6 +18,10 @@ test("completion: bash script registers _qorrol_completion and wires `complete`"
   assert.ok(out.includes("create"));
   assert.ok(out.includes("list"));
   assert.ok(out.includes("ps"));
+  assert.ok(out.includes("doctor"));
+  assert.ok(out.includes("resolve"));
+  assert.ok(out.includes("issues"));
+  assert.ok(out.includes("request"));
   // Each template name appears in the suggestion set
   for (const t of inlineRegistry.list()) {
     assert.ok(out.includes(t.name), `bash script missing template ${t.name}`);

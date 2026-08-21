@@ -3,6 +3,7 @@ import {
   getRunningProcesses,
   GetRunningProcessesError,
 } from "../processes/index.js";
+import { emitErrorAndExit, emitSuccess } from "../utils/output.js";
 
 export type PsCommandOptions = {
   exclude?: string[];
@@ -23,34 +24,38 @@ export async function listRunningProcesses(
 ): Promise<void> {
   const excludeCommandSubstrings = parseExcludeList(options.exclude);
   const timeoutMs = options.timeout;
+  const json = Boolean(options.json);
 
   try {
-    const rows = await getRunningProcesses({
+    const processes = await getRunningProcesses({
       excludeCommandSubstrings,
       ...(timeoutMs !== undefined ? { timeoutMs } : {}),
     });
 
-    if (options.json) {
-      console.log(JSON.stringify(rows, null, 2));
-      return;
-    }
+    emitSuccess(
+      json,
+      "ps",
+      { processes, count: processes.length },
+      () => {
+        if (processes.length === 0) {
+          console.log(chalk.gray("No processes matched."));
+          return;
+        }
 
-    if (rows.length === 0) {
-      console.log(chalk.gray("No processes matched."));
-      return;
-    }
-
-    console.log(chalk.blue.bold(`\nRunning processes (${rows.length}):\n`));
-    for (const row of rows) {
-      console.log(
-        `${chalk.cyan(String(row.pid).padStart(6))}  ${row.command}`,
-      );
-    }
-    console.log();
+        console.log(chalk.blue.bold(`\nRunning processes (${processes.length}):\n`));
+        for (const row of processes) {
+          console.log(
+            `${chalk.cyan(String(row.pid).padStart(6))}  ${row.command}`,
+          );
+        }
+        console.log();
+      },
+    );
   } catch (error) {
     if (error instanceof GetRunningProcessesError) {
-      console.error(chalk.red(`Error: ${error.message}`));
-      process.exit(1);
+      emitErrorAndExit(json, error.code, error.message, undefined, () => {
+        console.error(chalk.red(`Error: ${error.message}`));
+      });
     }
     throw error;
   }

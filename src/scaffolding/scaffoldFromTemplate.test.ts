@@ -159,6 +159,31 @@ test("scaffoldFromTemplate: warns on non-empty cwd when no projectName given", a
   }
 });
 
+test("scaffoldFromTemplate: dryRun skips materialize after validation", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "preview-app",
+      cwd,
+      registry: makeRegistry(),
+      dryRun: true,
+      materialize: async () => {
+        throw new Error("materialize must not be called");
+      },
+    });
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.dryRun, true);
+    assert.equal(result.renamedPackage, false);
+    assert.equal(result.projectName, "preview-app");
+    assert.equal(result.targetDir, path.join(cwd, "preview-app"));
+    assert.equal(await fs.pathExists(result.targetDir), false);
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
 test("scaffoldFromTemplate: progress emits validated, materialize, rename_package", async () => {
   const cwd = await tmpDir();
   try {

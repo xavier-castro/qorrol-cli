@@ -16,6 +16,8 @@ export interface ScaffoldInput {
   registry: TemplateRegistry;
   /** Override how a Template becomes bytes on disk (default: git clone). */
   materialize?: TemplateMaterializer;
+  /** Validate and resolve only — do not clone or rewrite package.json. */
+  dryRun?: boolean;
 }
 
 export type ScaffoldFailureCode =
@@ -32,6 +34,7 @@ export type ScaffoldResult =
       projectName?: string;
       renamedPackage: boolean;
       warnedNonEmptyCwd: boolean;
+      dryRun: boolean;
     }
   | {
       ok: false;
