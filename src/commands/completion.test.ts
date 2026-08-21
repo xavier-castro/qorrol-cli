@@ -30,7 +30,7 @@ test("completion: bash script registers _qorrol_completion and wires `complete`"
 
 test("completion: zsh script declares #compdef qorrol and lists templates", () => {
   const out = getCompletionScript("zsh", inlineRegistry);
-  assert.ok(out.includes("#compdef qorrol"));
+  assert.ok(out.startsWith("#compdef qorrol"));
   for (const t of inlineRegistry.list()) {
     assert.ok(out.includes(t.name), `zsh script missing template ${t.name}`);
   }

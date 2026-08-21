@@ -72,8 +72,8 @@ function zshScript(registry: TemplateRegistry): string {
     .list()
     .map((t) => `'${t.name}:${t.description.replace(/'/g, "'\\''")}'`)
     .join(" ");
-  return `${HEADER}
-#compdef qorrol
+  return `#compdef qorrol
+${HEADER}
 _qorrol() {
   local -a commands
   commands=(
