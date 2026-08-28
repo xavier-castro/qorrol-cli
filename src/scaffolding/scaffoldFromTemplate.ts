@@ -6,6 +6,7 @@ import {
   checkDirectoryExists,
   isDirectoryEmpty,
 } from "../utils/validation.js";
+import { rewriteWranglerNames } from "../utils/wrangler.js";
 import type {
   ScaffoldInput,
   ScaffoldProgress,
@@ -73,6 +74,7 @@ export async function scaffoldFromTemplate(
       targetDir,
       projectName,
       renamedPackage: false,
+      renamedWranglers: 0,
       warnedNonEmptyCwd,
       dryRun: true,
     };
@@ -103,12 +105,19 @@ export async function scaffoldFromTemplate(
     }
   }
 
+  let renamedWranglers = 0;
+  if (projectName) {
+    onProgress?.({ phase: "rename_wranglers" });
+    renamedWranglers = await rewriteWranglerNames(targetDir, projectName);
+  }
+
   return {
     ok: true,
     template,
     targetDir,
     projectName,
     renamedPackage,
+    renamedWranglers,
     warnedNonEmptyCwd,
     dryRun: false,
   };

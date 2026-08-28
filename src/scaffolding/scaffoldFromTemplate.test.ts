@@ -46,6 +46,7 @@ test("scaffoldFromTemplate: ok path with materialize injection and package.json 
     if (!result.ok) return;
     assert.equal(materialized, path.join(cwd, "my-app"));
     assert.equal(result.renamedPackage, true);
+    assert.equal(result.renamedWranglers, 0);
     assert.equal(result.projectName, "my-app");
     const pkg = await fs.readJson(path.join(cwd, "my-app", "package.json"));
     assert.equal(pkg.name, "my-app");
@@ -176,6 +177,7 @@ test("scaffoldFromTemplate: dryRun skips materialize after validation", async ()
     if (!result.ok) return;
     assert.equal(result.dryRun, true);
     assert.equal(result.renamedPackage, false);
+    assert.equal(result.renamedWranglers, 0);
     assert.equal(result.projectName, "preview-app");
     assert.equal(result.targetDir, path.join(cwd, "preview-app"));
     assert.equal(await fs.pathExists(result.targetDir), false);
@@ -184,7 +186,7 @@ test("scaffoldFromTemplate: dryRun skips materialize after validation", async ()
   }
 });
 
-test("scaffoldFromTemplate: progress emits validated, materialize, rename_package", async () => {
+test("scaffoldFromTemplate: progress emits validated, materialize, rename_package, rename_wranglers", async () => {
   const cwd = await tmpDir();
   try {
     const phases: string[] = [];
@@ -203,7 +205,103 @@ test("scaffoldFromTemplate: progress emits validated, materialize, rename_packag
       },
       (p) => phases.push(p.phase),
     );
-    assert.deepEqual(phases, ["validated", "materialize", "rename_package"]);
+    assert.deepEqual(phases, [
+      "validated",
+      "materialize",
+      "rename_package",
+      "rename_wranglers",
+    ]);
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: rewrites wrangler names in saas-kit monorepo pattern", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "valenteer-accounting",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async (_t, targetDir) => {
+        await fs.ensureDir(targetDir);
+        await fs.ensureDir(path.join(targetDir, "apps", "user-application"));
+        await fs.ensureDir(path.join(targetDir, "apps", "data-service"));
+
+        await fs.writeJson(path.join(targetDir, "package.json"), {
+          name: "saas-kit-template",
+        });
+
+        await fs.writeJson(
+          path.join(targetDir, "apps", "user-application", "wrangler.jsonc"),
+          {
+            name: "saas-kit-user-application",
+            main: "src/index.ts",
+          },
+        );
+
+        await fs.writeJson(
+          path.join(targetDir, "apps", "data-service", "wrangler.jsonc"),
+          {
+            name: "saas-kit-data-service",
+            main: "src/index.ts",
+          },
+        );
+      },
+    });
+
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.renamedPackage, true);
+    assert.equal(result.renamedWranglers, 2);
+
+    const userAppWrangler = await fs.readJson(
+      path.join(cwd, "valenteer-accounting", "apps", "user-application", "wrangler.jsonc"),
+    );
+    const dataServiceWrangler = await fs.readJson(
+      path.join(cwd, "valenteer-accounting", "apps", "data-service", "wrangler.jsonc"),
+    );
+
+    assert.equal(userAppWrangler.name, "valenteer-accounting-user-application");
+    assert.equal(dataServiceWrangler.name, "valenteer-accounting-data-service");
+  } finally {
+    await fs.remove(cwd);
+  }
+});
+
+test("scaffoldFromTemplate: rewrites wrangler name at repo root", async () => {
+  const cwd = await tmpDir();
+  try {
+    const result = await scaffoldFromTemplate({
+      templateName: TEMPLATE.name,
+      projectName: "my-single-worker",
+      cwd,
+      registry: makeRegistry(),
+      materialize: async (_t, targetDir) => {
+        await fs.ensureDir(targetDir);
+
+        await fs.writeJson(path.join(targetDir, "package.json"), {
+          name: "template-name",
+        });
+
+        await fs.writeJson(path.join(targetDir, "wrangler.jsonc"), {
+          name: "template-name",
+          main: "src/index.ts",
+        });
+      },
+    });
+
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.renamedPackage, true);
+    assert.equal(result.renamedWranglers, 1);
+
+    const wrangler = await fs.readJson(
+      path.join(cwd, "my-single-worker", "wrangler.jsonc"),
+    );
+
+    assert.equal(wrangler.name, "my-single-worker");
   } finally {
     await fs.remove(cwd);
   }
