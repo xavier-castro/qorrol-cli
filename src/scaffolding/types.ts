@@ -33,6 +33,7 @@ export type ScaffoldResult =
       targetDir: string;
       projectName?: string;
       renamedPackage: boolean;
+      renamedWranglers: number;
       warnedNonEmptyCwd: boolean;
       dryRun: boolean;
     }
@@ -47,4 +48,5 @@ export type ScaffoldResult =
 export type ScaffoldProgress =
   | { phase: "validated"; warnedNonEmptyCwd: boolean }
   | { phase: "materialize" }
-  | { phase: "rename_package" };
+  | { phase: "rename_package" }
+  | { phase: "rename_wranglers" };
